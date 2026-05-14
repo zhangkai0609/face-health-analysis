@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人脸识别与健康关联分析系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#0FC6C2',
+                        success: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        dark: '#1D2129',
+                        'gray-100': '#F2F3F5',
+                        'gray-200': '#E5E6EB',
+                        'gray-300': '#C9CDD4',
+                        'gray-400': '#86909C',
+                        'gray-500': '#4E5969',
+                        'gray-600': '#272E3B',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
+            }
+            .btn-outline {
+                @apply border border-primary text-primary hover:bg-primary hover:text-white font-medium py-2 px-6 rounded-lg transition-all duration-300;
+            }
+            .btn-ghost {
+                @apply text-gray-600 hover:text-primary font-medium py-2 px-4 rounded-lg transition-all duration-300;
+            }
+            .card {
+                @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md;
+            }
+            .carousel-item {
+                @apply absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out;
+            }
+            .carousel-item.active {
+                @apply opacity-100;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-600 min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo和系统名称 -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fa fa-id-card text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-dark">人脸识别与健康关联分析系统</h1>
+                </div>
+
+                <!-- 主导航 -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">首页</a>
+                    <a href="#" class="text-gray-600 hover:text-primary transition-colors">快速健康分析</a>
+                    <a href="#" class="text-gray-600 hover:text-primary transition-colors">历史报告</a>
+                    <a href="#" class="text-gray-600 hover:text-primary transition-colors">系统公告</a>
+                </nav>
+
+                <!-- 右侧功能区 -->
+                <div class="flex items-center space-x-4">
+                    <!-- 搜索框 -->
+                    <div class="relative hidden md:block">
+                        <input type="text" placeholder="搜索..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 w-48">
+                        <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+
+                    <!-- 注册/登录按钮 -->
+                    <a href="#" class="btn-ghost">注册</a>
+                    <a href="#" class="btn-outline">登录</a>
+                    <a href="管理员登录界面.html" class="hidden md:inline-flex text-gray-500 hover:text-primary text-sm transition-colors">管理员登录</a>
+
+                    <!-- 移动端菜单按钮 -->
+                    <button class="md:hidden text-gray-600 hover:text-primary">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="flex-1 pt-16">
+        <!-- 轮播图区域 -->
+        <section class="relative h-[500px] overflow-hidden">
+            <div id="carousel" class="relative h-full">
+                <!-- 轮播图1 -->
+                <div class="carousel-item active">
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70"></div>
+                    <img src="https://picsum.photos/seed/health1/1920/500" alt="人脸识别与健康分析" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="container mx-auto px-4">
+                            <div class="max-w-2xl text-white">
+                                <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight mb-4">
+                                    AI人脸识别<br>智能健康分析
+                                </h2>
+                                <p class="text-[clamp(1rem,2vw,1.25rem)] mb-8 opacity-90">
+                                    基于先进的人脸识别技术和人工智能算法，非接触式快速检测您的健康状况，为您的健康保驾护航
+                                </p>
+                                <a href="#" class="bg-white text-primary hover:bg-gray-100 font-bold py-4 px-10 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl inline-flex items-center">
+                                    <i class="fa fa-camera mr-3 text-lg"></i>
+                                    立即开始健康分析
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 轮播图2 -->
+                <div class="carousel-item">
+                    <div class="absolute inset-0 bg-gradient-to-r from-secondary/90 to-secondary/70"></div>
+                    <img src="https://picsum.photos/seed/health2/1920/500" alt="非接触式健康检测" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="container mx-auto px-4">
+                            <div class="max-w-2xl text-white">
+                                <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight mb-4">
+                                    非接触式检测<br>安全又便捷
+                                </h2>
+                                <p class="text-[clamp(1rem,2vw,1.25rem)] mb-8 opacity-90">
+                                    无需任何物理接触，只需面对摄像头几秒钟，即可完成多项健康指标检测，安全卫生，方便快捷
+                                </p>
+                                <a href="#" class="bg-white text-secondary hover:bg-gray-100 font-bold py-4 px-10 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl inline-flex items-center">
+                                    <i class="fa fa-heartbeat mr-3 text-lg"></i>
+                                    了解检测原理
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 轮播图3 -->
+                <div class="carousel-item">
+                    <div class="absolute inset-0 bg-gradient-to-r from-warning/90 to-warning/70"></div>
+                    <img src="https://picsum.photos/seed/health3/1920/500" alt="健康报告管理" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="container mx-auto px-4">
+                            <div class="max-w-2xl text-white">
+                                <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight mb-4">
+                                    生成专业报告<br>追踪健康趋势
+                                </h2>
+                                <p class="text-[clamp(1rem,2vw,1.25rem)] mb-8 opacity-90">
+                                    自动生成详细的健康分析报告，记录您的健康数据变化趋势，提供个性化的健康建议和预警
+                                </p>
+                                <a href="#" class="bg-white text-warning hover:bg-gray-100 font-bold py-4 px-10 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl inline-flex items-center">
+                                    <i class="fa fa-file-text-o mr-3 text-lg"></i>
+                                    查看历史报告
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 轮播图指示器 -->
+                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3">
+                    <button class="carousel-indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-colors active" data-index="0"></button>
+                    <button class="carousel-indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-colors" data-index="1"></button>
+                    <button class="carousel-indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-colors" data-index="2"></button>
+                </div>
+
+                <!-- 左右箭头 -->
+                <button id="prevBtn" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors">
+                    <i class="fa fa-chevron-left text-xl"></i>
+                </button>
+                <button id="nextBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors">
+                    <i class="fa fa-chevron-right text-xl"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 核心功能入口 -->
+        <section id="announcements" class="py-16 bg-white">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold text-dark mb-4">开始您的健康检测之旅</h2>
+                <p class="text-gray-500 mb-12 max-w-2xl mx-auto">
+                    只需简单三步，即可完成非接触式健康分析，获取专业的健康报告和个性化建议
+                </p>
+
+                <!-- 核心按钮 -->
+                <a href="#" class="btn-primary text-lg py-4 px-12 inline-flex items-center mb-12">
+                    <i class="fa fa-camera mr-3 text-xl"></i>
+                    立即开始健康分析
+                </a>
+
+                <!-- 功能步骤 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa fa-camera text-3xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-dark mb-2">1. 人脸采集</h3>
+                        <p class="text-gray-500">面对摄像头，保持自然表情，系统将自动采集您的面部图像</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa fa-cogs text-3xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-dark mb-2">2. AI分析</h3>
+                        <p class="text-gray-500">系统采用先进的AI算法，快速分析您的面部特征和健康指标</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa fa-file-text-o text-3xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-dark mb-2">3. 生成报告</h3>
+                        <p class="text-gray-500">生成详细的健康分析报告，提供个性化的健康建议和预警</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 系统优势 -->
+        <section class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-dark mb-12 text-center">系统核心优势</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="card p-6 text-center">
+                        <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="fa fa-bolt text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-dark mb-2">快速检测</h3>
+                        <p class="text-gray-500 text-sm">仅需3-5秒即可完成健康检测，无需长时间等待</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="fa fa-shield text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-dark mb-2">非接触式</h3>
+                        <p class="text-gray-500 text-sm">无需任何物理接触，安全卫生，避免交叉感染</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="fa fa-brain text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-dark mb-2">AI智能</h3>
+                        <p class="text-gray-500 text-sm">基于深度学习算法，准确率高，分析结果可靠</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="fa fa-lock text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-dark mb-2">数据安全</h3>
+                        <p class="text-gray-500 text-sm">严格保护用户隐私，所有数据加密存储，绝不泄露</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最新公告 -->
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-dark">最新系统公告</h2>
+                    <a href="#" class="text-primary hover:text-primary/80 transition-colors flex items-center">
+                        查看更多 <i class="fa fa-chevron-right ml-2"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 公告列表 -->
+                    <div class="space-y-4">
+                        <a href="#" class="block p-4 border border-gray-200 rounded-lg hover:border-primary hover:shadow-sm transition-all duration-300">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-dark hover:text-primary transition-colors">关于系统人脸识别功能升级的通知</h3>
+                                <span class="text-sm text-gray-400 whitespace-nowrap ml-4">2024-05-10</span>
+                            </div>
+                            <p class="text-gray-500 text-sm line-clamp-2">为了提升系统性能和用户体验，我们将于2024年5月15日凌晨00:00-06:00对系统人脸识别功能进行升级维护...</p>
+                        </a>
+
+                        <a href="#" class="block p-4 border border-gray-200 rounded-lg hover:border-primary hover:shadow-sm transition-all duration-300">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-dark hover:text-primary transition-colors">夏季健康养生小贴士</h3>
+                                <span class="text-sm text-gray-400 whitespace-nowrap ml-4">2024-05-08</span>
+                            </div>
+                            <p class="text-gray-500 text-sm line-clamp-2">夏季气温高，人体新陈代谢旺盛，容易出现疲劳、中暑等情况。以下是一些夏季健康养生小贴士...</p>
+                        </a>
+
+                        <a href="#" class="block p-4 border border-gray-200 rounded-lg hover:border-primary hover:shadow-sm transition-all duration-300">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-dark hover:text-primary transition-colors">系统维护通知</h3>
+                                <span class="text-sm text-gray-400 whitespace-nowrap ml-4">2024-05-05</span>
+                            </div>
+                            <p class="text-gray-500 text-sm line-clamp-2">为了提供更稳定的服务，我们将于2024年5月7日凌晨02:00-04:00进行系统例行维护...</p>
+                        </a>
+
+                        <a href="#" class="block p-4 border border-gray-200 rounded-lg hover:border-primary hover:shadow-sm transition-all duration-300">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-dark hover:text-primary transition-colors">高血压患者日常注意事项</h3>
+                                <span class="text-sm text-gray-400 whitespace-nowrap ml-4">2024-05-03</span>
+                            </div>
+                            <p class="text-gray-500 text-sm line-clamp-2">高血压是一种常见的慢性病，需要长期管理和注意。以下是高血压患者日常需要注意的事项...</p>
+                        </a>
+
+                        <a href="#" class="block p-4 border border-gray-200 rounded-lg hover:border-primary hover:shadow-sm transition-all duration-300">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-dark hover:text-primary transition-colors">新功能上线预告</h3>
+                                <span class="text-sm text-gray-400 whitespace-nowrap ml-4">2024-05-01</span>
+                            </div>
+                            <p class="text-gray-500 text-sm line-clamp-2">我们即将推出健康趋势分析功能，帮助您更好地了解自己的健康变化趋势...</p>
+                        </a>
+                    </div>
+
+                    <!-- 右侧图片 -->
+                    <div class="hidden md:block">
+                        <img src="https://picsum.photos/seed/announcement/600/400" alt="系统公告" class="w-full h-full object-cover rounded-xl">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                            <i class="fa fa-id-card text-primary text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">人脸识别与健康关联分析系统</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        基于先进的人脸识别技术和人工智能算法，为您提供非接触式、快速、准确的健康分析服务
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">快速链接</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">首页</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">快速健康分析</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">历史报告</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">系统公告</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">帮助中心</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">使用教程</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">常见问题</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">联系我们</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">意见反馈</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">联系我们</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-center">
+                            <i class="fa fa-envelope-o mr-3"></i>
+                            <span>contact@health-system.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-phone mr-3"></i>
+                            <span>400-123-4567</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-map-marker mr-3"></i>
+                            <span>北京市海淀区科技园区</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">
+                    © 2024 人脸识别与健康关联分析系统 版权所有
+                </p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">隐私政策</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">服务条款</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">网站地图</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 轮播图功能
+        const carouselItems = document.querySelectorAll('.carousel-item');
+        const indicators = document.querySelectorAll('.carousel-indicator');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentIndex = 0;
+        let carouselInterval;
+
+        // 显示指定索引的轮播图
+        function showSlide(index) {
+            // 隐藏所有轮播图
+            carouselItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            // 移除所有指示器的active状态
+            indicators.forEach(indicator => {
+                indicator.classList.remove('active');
+                indicator.classList.remove('bg-white');
+                indicator.classList.add('bg-white/50');
+            });
+
+            // 显示当前轮播图
+            carouselItems[index].classList.add('active');
+            // 设置当前指示器为active状态
+            indicators[index].classList.add('active');
+            indicators[index].classList.remove('bg-white/50');
+            indicators[index].classList.add('bg-white');
+
+            currentIndex = index;
+        }
+
+        // 下一张轮播图
+        function nextSlide() {
+            let nextIndex = currentIndex + 1;
+            if (nextIndex >= carouselItems.length) {
+                nextIndex = 0;
+            }
+            showSlide(nextIndex);
+        }
+
+        // 上一张轮播图
+        function prevSlide() {
+            let prevIndex = currentIndex - 1;
+            if (prevIndex < 0) {
+                prevIndex = carouselItems.length - 1;
+            }
+            showSlide(prevIndex);
+        }
+
+        // 自动播放
+        function startCarousel() {
+            carouselInterval = setInterval(nextSlide, 5000);
+        }
+
+        // 停止自动播放
+        function stopCarousel() {
+            clearInterval(carouselInterval);
+        }
+
+        // 指示器点击事件
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                showSlide(index);
+                stopCarousel();
+                startCarousel();
+            });
+        });
+
+        // 左右箭头点击事件
+        prevBtn.addEventListener('click', () => {
+            prevSlide();
+            stopCarousel();
+            startCarousel();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            nextSlide();
+            stopCarousel();
+            startCarousel();
+        });
+
+        // 鼠标悬停时停止自动播放
+        document.getElementById('carousel').addEventListener('mouseenter', stopCarousel);
+        document.getElementById('carousel').addEventListener('mouseleave', startCarousel);
+
+        // 启动自动播放
+        startCarousel();
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>

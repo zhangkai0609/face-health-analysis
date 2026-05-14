@@ -1,0 +1,10 @@
+{
+  "name": "face-health-analysis-system",
+  "version": "1.0.0",
+  "description": "人脸识别与健康关联分析系统课程设计后端服务",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --no-warnings server.js"
+  },
+  "license": "MIT"
+}

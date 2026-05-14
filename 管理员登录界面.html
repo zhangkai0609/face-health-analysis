@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录界面 - 人脸识别与健康关联分析系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#0FC6C2',
+                        danger: '#F53F3F',
+                        dark: '#1D2129'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg;
+            }
+            .btn-outline {
+                @apply border border-primary text-primary hover:bg-primary hover:text-white font-medium py-3 px-6 rounded-lg transition-all duration-300;
+            }
+            .input-field {
+                @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-600 min-h-screen flex flex-col">
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <a href="首页管理.html" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fa fa-id-card text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-dark">人脸识别与健康关联分析系统</h1>
+                </a>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="首页管理.html" class="text-gray-600 hover:text-primary transition-colors">用户端首页</a>
+                    <a href="login.html" class="text-gray-600 hover:text-primary transition-colors">用户登录</a>
+                    <a href="用户注册.html" class="text-gray-600 hover:text-primary transition-colors">用户注册</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 pt-24 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                        <i class="fa fa-shield text-3xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-dark mb-2">管理员登录</h2>
+                    <p class="text-gray-500">登录后进入管理端口，维护后台管理模块</p>
+                </div>
+
+                <form id="adminLoginForm" class="space-y-5">
+                    <div>
+                        <label for="adminUsername" class="block text-sm font-medium text-gray-700 mb-1">
+                            管理员账号 <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" id="adminUsername" class="input-field" placeholder="请输入管理员账号" required>
+                    </div>
+                    <div>
+                        <label for="adminPassword" class="block text-sm font-medium text-gray-700 mb-1">
+                            管理员密码 <span class="text-danger">*</span>
+                        </label>
+                        <input type="password" id="adminPassword" class="input-field" placeholder="请输入管理员密码" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full text-lg py-3 mt-6">
+                        <i class="fa fa-sign-in mr-2"></i>进入管理端口
+                    </button>
+                    <a href="首页管理.html" class="btn-outline w-full text-center block">
+                        返回用户端首页
+                    </a>
+                    <p class="text-xs text-gray-400 text-center">
+                        管理员账号：admin，密码：admin123456
+                    </p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

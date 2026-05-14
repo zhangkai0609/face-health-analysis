@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 人脸识别与健康关联分析系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#0FC6C2',
+                        success: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        dark: '#1D2129',
+                        'gray-100': '#F2F3F5',
+                        'gray-200': '#E5E6EB',
+                        'gray-300': '#C9CDD4',
+                        'gray-400': '#86909C',
+                        'gray-500': '#4E5969',
+                        'gray-600': '#272E3B',
+                        'sidebar-bg': '#2A3041',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sidebar-item-active {
+                @apply bg-primary/20 text-white border-l-4 border-primary;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+            }
+            .btn-outline {
+                @apply border border-gray-300 hover:border-primary text-gray-600 hover:text-primary font-medium py-2 px-4 rounded-lg transition-all duration-200;
+            }
+            .btn-danger {
+                @apply bg-danger hover:bg-danger/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+            }
+            .card {
+                @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
+            }
+            .input-field {
+                @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
+            }
+            .input-error {
+                @apply border-danger focus:ring-danger/30 focus:border-danger;
+            }
+            .status-normal {
+                @apply bg-success/10 text-success px-2 py-1 rounded-full text-xs font-medium;
+            }
+            .status-warning {
+                @apply bg-warning/10 text-warning px-2 py-1 rounded-full text-xs font-medium;
+            }
+            .status-danger {
+                @apply bg-danger/10 text-danger px-2 py-1 rounded-full text-xs font-medium;
+            }
+            .table-row-hover {
+                @apply hover:bg-gray-50 transition-colors duration-150;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-600 min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-30">
+        <div class="flex items-center justify-between h-16 px-6">
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fa fa-id-card text-white text-lg"></i>
+                    </div>
+                    <h1 class="text-lg font-semibold text-dark">人脸识别与健康关联分析系统</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="text-gray-500 hover:text-primary transition-colors">
+                    <i class="fa fa-bell-o text-lg"></i>
+                </button>
+                <div class="flex items-center space-x-2 cursor-pointer">
+                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span class="font-medium">张三</span>
+                    <i class="fa fa-chevron-down text-xs text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 pt-16">
+        <!-- 左侧导航栏 -->
+        <aside class="w-64 bg-sidebar-bg fixed left-0 top-16 bottom-0 overflow-y-auto">
+            <nav class="py-4">
+                <div class="px-4 mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                            <i class="fa fa-user text-2xl text-primary"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-medium">张三</h3>
+                            <p class="text-gray-400 text-xs">普通用户</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="sidebar-item-active flex items-center px-4 py-3 text-sm text-gray-300" data-page="overview">
+                            <i class="fa fa-home w-5 text-center mr-3"></i>
+                            <span>个人概览</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-300 hover:bg-white/5 transition-colors" data-page="profile">
+                            <i class="fa fa-user-circle w-5 text-center mr-3"></i>
+                            <span>个人信息</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-300 hover:bg-white/5 transition-colors" data-page="reports">
+                            <i class="fa fa-file-text-o w-5 text-center mr-3"></i>
+                            <span>健康报告</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-300 hover:bg-white/5 transition-colors" data-page="face-records">
+                            <i class="fa fa-camera w-5 text-center mr-3"></i>
+                            <span>人脸识别记录</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-300 hover:bg-white/5 transition-colors" data-page="security">
+                            <i class="fa fa-shield w-5 text-center mr-3"></i>
+                            <span>账号安全</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="absolute bottom-0 left-0 right-0 p-4">
+                    <button id="logoutBtn" class="w-full bg-white/10 hover:bg-white/20 text-gray-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 flex items-center justify-center">
+                        <i class="fa fa-sign-out mr-2"></i>
+                        退出登录
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 右侧主内容区域 -->
+        <main class="flex-1 ml-64 p-6">
+            <!-- 个人概览页面 -->
+            <div id="overview-page" class="page-content">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-dark">个人概览</h2>
+                    <p class="text-gray-500 mt-1">欢迎回来，张三！您的健康状况良好</p>
+                </div>
+
+                <!-- 个人信息卡片和立即检测按钮 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="card p-6 lg:col-span-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-6">
+                                <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <i class="fa fa-user text-4xl text-primary"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-dark mb-2">张三</h3>
+                                    <div class="space-y-1 text-sm text-gray-500">
+                                        <p><i class="fa fa-calendar-o mr-2"></i>注册时间：2024-01-15</p>
+                                        <p><i class="fa fa-stethoscope mr-2"></i>累计健康检测：<span class="font-medium text-primary">12</span> 次</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#" class="btn-primary text-lg py-3 px-6 flex items-center">
+                                <i class="fa fa-camera mr-2"></i>
+                                立即检测
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card p-6">
+                        <h3 class="text-lg font-semibold text-dark mb-4">最新健康报告</h3>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500">生成时间</span>
+                            <span class="text-sm font-medium">2024-05-12 09:45</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500">健康评分</span>
+                            <span class="text-2xl font-bold text-success">92</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">健康状态</span>
+                            <span class="status-normal">正常</span>
+                        </div>
+                        <a href="#" class="btn-outline w-full mt-4 text-center">查看完整报告</a>
+                    </div>
+                </div>
+
+                <!-- 统计卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-medium text-gray-500">本月检测次数</h3>
+                            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <i class="fa fa-calendar-check-o text-primary"></i>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-dark">5</p>
+                        <p class="text-xs text-success mt-1"><i class="fa fa-arrow-up mr-1"></i>比上月增加2次</p>
+                    </div>
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-medium text-gray-500">平均健康评分</h3>
+                            <div class="w-10 h-10 bg-success/10 rounded-lg flex items-center justify-center">
+                                <i class="fa fa-heartbeat text-success"></i>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-dark">88.5</p>
+                        <p class="text-xs text-success mt-1"><i class="fa fa-arrow-up mr-1"></i>比上月提升3.2分</p>
+                    </div>
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-medium text-gray-500">异常记录数</h3>
+                            <div class="w-10 h-10 bg-warning/10 rounded-lg flex items-center justify-center">
+                                <i class="fa fa-exclamation-triangle text-warning"></i>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-dark">1</p>
+                        <p class="text-xs text-gray-500 mt-1">已全部复查</p>
+                    </div>
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-medium text-gray-500">连续健康天数</h3>
+                            <div class="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
+                                <i class="fa fa-trophy text-secondary"></i>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-dark">28</p>
+                        <p class="text-xs text-gray-500 mt-1">继续保持！</p>
+                    </div>
+                </div>
+
+                <!-- 最近健康趋势 -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-dark mb-4">最近7天健康趋势</h3>
+                    <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                        <p class="text-gray-400">健康趋势图表</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 个人信息页面 -->
+            <div id="profile-page" class="page-content hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-dark">个人信息</h2>
+                    <p class="text-gray-500 mt-1">查看和编辑您的个人资料</p>
+                </div>
+
+                <div class="card p-6 max-w-2xl">
+                    <form id="profileForm" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+                            <input type="text" class="input-field bg-gray-50" value="zhangsan" disabled>
+                            <p class="text-xs text-gray-400 mt-1">用户名不可修改</p>
+                        </div>
+
+                        <div>
+                            <label for="realName" class="block text-sm font-medium text-gray-700 mb-1">
+                                真实姓名 <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" id="realName" class="input-field" value="张三" required>
+                            <p class="text-xs text-danger mt-1 hidden" id="realNameError">请输入真实姓名</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                性别 <span class="text-danger">*</span>
+                            </label>
+                            <div class="flex space-x-8">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="gender" value="male" class="w-4 h-4 text-primary focus:ring-primary" checked>
+                                    <span class="ml-2 text-gray-700">男</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="gender" value="female" class="w-4 h-4 text-primary focus:ring-primary">
+                                    <span class="ml-2 text-gray-700">女</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+                                手机号码 <span class="text-danger">*</span>
+                            </label>
+                            <input type="tel" id="phone" class="input-field" value="13800138001" required>
+                            <p class="text-xs text-danger mt-1 hidden" id="phoneError">请输入正确的手机号格式</p>
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                                邮箱地址
+                            </label>
+                            <input type="email" id="email" class="input-field" placeholder="请输入邮箱地址" value="zhangsan@example.com">
+                            <p class="text-xs text-danger mt-1 hidden" id="emailError">请输入正确的邮箱格式</p>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" class="btn-primary px-8">保存修改</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 健康报告页面 -->
+            <div id="reports-page" class="page-content hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-dark">健康报告</h2>
+                    <p class="text-gray-500 mt-1">查看您的所有历史健康分析报告</p>
+                </div>
+
+                <div class="card">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 text-left">
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500">报告编号</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500">生成时间</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500">健康评分</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500">健康状态</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500">核心结论</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500 text-right">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-200 table-row-hover">
+                                    <td class="px-6 py-4 text-sm font-medium">HR-20240512-0001</td>
+                                    <td class="px-6 py-4 text-sm">2024-05-12 09:45</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-success">92</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-normal">正常</span></td>
+                                    <td class="px-6 py-4 text-sm">各项指标均在正常范围内</td>
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <a href="#" class="text-primary hover:text-primary/80 transition-colors">查看详情</a>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200 table-row-hover">
+                                    <td class="px-6 py-4 text-sm font-medium">HR-20240511-0001</td>
+                                    <td class="px-6 py-4 text-sm">2024-05-11 14:20</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-success">95</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-normal">正常</span></td>
+                                    <td class="px-6 py-4 text-sm">身体健康状况良好</td>
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <a href="#" class="text-primary hover:text-primary/80 transition-colors">查看详情</a>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200 table-row-hover">
+                                    <td class="px-6 py-4 text-sm font-medium">HR-20240510-0001</td>
+                                    <td class="px-6 py-4 text-sm">2024-05-10 08:30</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-success">88</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-normal">正常</span></td>
+                                    <td class="px-6 py-4 text-sm">心率略快，建议休息</td>
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <a href="#" class="text-primary hover:text-primary/80 transition-colors">查看详情</a>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200 table-row-hover">
+                                    <td class="px-6 py-4 text-sm font-medium">HR-20240508-0001</td>
+                                    <td class="px-6 py-4 text-sm">2024-05-08 10:15</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-warning">76</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-warning">异常(待复查)</span></td>
+                                    <td class="px-6 py-4 text-sm">血压偏高，建议监测</td>
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <a href="#" class="text-primary hover:text-primary/80 transition-colors">查看详情</a>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200 table-row-hover">
+                                    <td class="px-6 py-4 text-sm font-medium">HR-20240505-0001</td>
+                                    <td class="px-6 py-4 text-sm">2024-05-05 16:30</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-success">90</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-normal">正常</span></td>
+                                    <td class="px-6 py-4 text-sm">各项指标正常</td>
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <a href="#" class="text-primary hover:text-primary/80 transition-colors">查看详情</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- 分页 -->
+                    <div class="flex justify-between items-center p-6 border-t border-gray-200">
+                        <div class="text-sm text-gray-500">
+                            共 <span class="font-medium">12</span> 条记录，当前第 <span class="font-medium">1</span> 页 / 共 <span class="font-medium">3</span> 页
+                        </div>
+                        <div class="flex space-x-1">
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-400 cursor-not-allowed">上一页</button>
+                            <button class="px-3 py-1 bg-primary text-white rounded text-sm">1</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">2</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">3</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 人脸识别记录页面 -->
+            <div id="face-records-page" class="page-content hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-dark">人脸识别记录</h2>
+                    <p class="text-gray-500 mt-1">查看您的所有人脸采集历史记录</p>
+                </div>
+
+                <div class="card">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 text-left">
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500">记录ID</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500">采集时间</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500">检测结果</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500">置信度</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500">关联健康报告</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-500 text-right">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-200 table-row-hover">
+                                    <td class="px-6 py-4 text-sm">FACE-20240512-0001</td>
+                                    <td class="px-6 py-4 text-sm">2024-05-12 09:45:19</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-normal">识别成功</span></td>
+                                    <td class="px-6 py-4 text-sm">94.5%</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <a href="#" class="text-primary hover:underline">HR-20240512-0001</a>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <button class="text-primary hover:text-primary/80 transition-colors">查看详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200 table-row-hover">
+                                    <td class="px-6 py-4 text-sm">FACE-20240511-0001</td>
+                                    <td class="px-6 py-4 text-sm">2024-05-11 14:20:33</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-normal">识别成功</span></td>
+                                    <td class="px-6 py-4 text-sm">98.2%</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <a href="#" class="text-primary hover:underline">HR-20240511-0001</a>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <button class="text-primary hover:text-primary/80 transition-colors">查看详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200 table-row-hover">
+                                    <td class="px-6 py-4 text-sm">FACE-20240510-0001</td>
+                                    <td class="px-6 py-4 text-sm">2024-05-10 08:30:15</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-normal">识别成功</span></td>
+                                    <td class="px-6 py-4 text-sm">96.8%</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <a href="#" class="text-primary hover:underline">HR-20240510-0001</a>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <button class="text-primary hover:text-primary/80 transition-colors">查看详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200 table-row-hover">
+                                    <td class="px-6 py-4 text-sm">FACE-20240508-0001</td>
+                                    <td class="px-6 py-4 text-sm">2024-05-08 10:15:42</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-warning">低置信度</span></td>
+                                    <td class="px-6 py-4 text-sm">72.3%</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <a href="#" class="text-primary hover:underline">HR-20240508-0001</a>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <button class="text-primary hover:text-primary/80 transition-colors">查看详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200 table-row-hover">
+                                    <td class="px-6 py-4 text-sm">FACE-20240505-0001</td>
+                                    <td class="px-6 py-4 text-sm">2024-05-05 16:30:08</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-normal">识别成功</span></td>
+                                    <td class="px-6 py-4 text-sm">92.7%</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <a href="#" class="text-primary hover:underline">HR-20240505-0001</a>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <button class="text-primary hover:text-primary/80 transition-colors">查看详情</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- 分页 -->
+                    <div class="flex justify-between items-center p-6 border-t border-gray-200">
+                        <div class="text-sm text-gray-500">
+                            共 <span class="font-medium">12</span> 条记录，当前第 <span class="font-medium">1</span> 页 / 共 <span class="font-medium">3</span> 页
+                        </div>
+                        <div class="flex space-x-1">
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-400 cursor-not-allowed">上一页</button>
+                            <button class="px-3 py-1 bg-primary text-white rounded text-sm">1</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">2</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">3</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 账号安全页面 -->
+            <div id="security-page" class="page-content hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-dark">账号安全</h2>
+                    <p class="text-gray-500 mt-1">管理您的账号安全设置，保护个人信息和健康数据</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- 修改密码 -->
+                    <div class="card p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-dark">修改登录密码</h3>
+                            <span class="text-xs text-success bg-success/10 px-2 py-1 rounded-full">安全</span>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-4">建议定期修改密码，使用强密码保护您的账号安全</p>
+                        <form id="passwordForm" class="space-y-4 max-w-md">
+                            <div>
+                                <label for="oldPassword" class="block text-sm font-medium text-gray-700 mb-1">当前密码</label>
+                                <input type="password" id="oldPassword" class="input-field" placeholder="请输入当前密码" required>
+                            </div>
+                            <div>
+                                <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">新密码</label>
+                                <input type="password" id="newPassword" class="input-field" placeholder="请输入新密码" required>
+                                <p class="text-xs text-gray-400 mt-1">密码长度至少6位，包含字母和数字</p>
+                            </div>
+                            <div>
+                                <label for="confirmNewPassword" class="block text-sm font-medium text-gray-700 mb-1">确认新密码</label>
+                                <input type="password" id="confirmNewPassword" class="input-field" placeholder="请再次输入新密码" required>
+                            </div>
+                            <button type="submit" class="btn-primary">修改密码</button>
+                        </form>
+                    </div>
+
+                    <!-- 更换手机号 -->
+                    <div class="card p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-dark">更换绑定手机号</h3>
+                            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">已绑定：138****001</span>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-4">更换手机号后，您将使用新手机号登录系统</p>
+                        <button class="btn-outline">更换手机号</button>
+                    </div>
+
+                    <!-- 安全提醒设置 -->
+                    <div class="card p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-dark">安全提醒设置</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                                <div>
+                                    <h4 class="font-medium text-dark">异地登录提醒</h4>
+                                    <p class="text-sm text-gray-500">当账号在非常用地点登录时发送提醒</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                            <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                                <div>
+                                    <h4 class="font-medium text-dark">密码过期提醒</h4>
+                                    <p class="text-sm text-gray-500">密码使用超过90天时提醒修改</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                            <div class="flex justify-between items-center py-3">
+                                <div>
+                                    <h4 class="font-medium text-dark">健康报告推送</h4>
+                                    <p class="text-sm text-gray-500">生成健康报告时发送短信通知</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 退出登录确认弹窗 -->
+    <div id="logoutModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md transform transition-all">
+            <div class="p-6">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                        <i class="fa fa-sign-out text-3xl text-primary"></i>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold text-dark text-center mb-2">确认退出登录</h3>
+                <p class="text-gray-500 text-center mb-6">
+                    您确定要退出当前账号吗？退出后将无法查看您的个人健康数据。
+                </p>
+                <div class="flex justify-center space-x-3">
+                    <button id="cancelLogout" class="btn-outline px-6">取消</button>
+                    <button id="confirmLogout" class="btn-primary px-6">确认退出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面切换功能
+        const navItems = document.querySelectorAll('.sidebar-item-active, .sidebar-item-active ~ li a');
+        const pageContents = document.querySelectorAll('.page-content');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // 移除所有导航项的激活状态
+                navItems.forEach(nav => {
+                    nav.classList.remove('sidebar-item-active');
+                    nav.classList.add('hover:bg-white/5');
+                });
+                
+                // 添加当前导航项的激活状态
+                item.classList.add('sidebar-item-active');
+                item.classList.remove('hover:bg-white/5');
+                
+                // 隐藏所有页面内容
+                pageContents.forEach(page => {
+                    page.classList.add('hidden');
+                });
+                
+                // 显示对应的页面内容
+                const pageId = item.getAttribute('data-page') + '-page';
+                document.getElementById(pageId).classList.remove('hidden');
+            });
+        });
+
+        // 个人信息表单验证
+        const profileForm = document.getElementById('profileForm');
+        const realName = document.getElementById('realName');
+        const phone = document.getElementById('phone');
+        const email = document.getElementById('email');
+        
+        const realNameError = document.getElementById('realNameError');
+        const phoneError = document.getElementById('phoneError');
+        const emailError = document.getElementById('emailError');
+
+        // 真实姓名验证
+        function validateRealName() {
+            if (realName.value.trim() === '') {
+                realName.classList.add('input-error');
+                realNameError.classList.remove('hidden');
+                return false;
+            } else {
+                realName.classList.remove('input-error');
+                realNameError.classList.add('hidden');
+                return true;
+            }
+        }
+
+        // 手机号验证
+        function validatePhone() {
+            const phoneRegex = /^1[3-9]\d{9}$/;
+            if (!phoneRegex.test(phone.value)) {
+                phone.classList.add('input-error');
+                phoneError.classList.remove('hidden');
+                return false;
+            } else {
+                phone.classList.remove('input-error');
+                phoneError.classList.add('hidden');
+                return true;
+            }
+        }
+
+        // 邮箱验证
+        function validateEmail() {
+            if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                email.classList.add('input-error');
+                emailError.classList.remove('hidden');
+                return false;
+            } else {
+                email.classList.remove('input-error');
+                emailError.classList.add('hidden');
+                return true;
+            }
+        }
+
+        // 实时验证
+        realName.addEventListener('blur', validateRealName);
+        phone.addEventListener('blur', validatePhone);
+        email.addEventListener('blur', validateEmail);
+
+        // 提交个人信息表单
+        profileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const isRealNameValid = validateRealName();
+            const isPhoneValid = validatePhone();
+            const isEmailValid = validateEmail();
+            
+            if (isRealNameValid && isPhoneValid && isEmailValid) {
+                alert('个人信息修改成功！');
+            }
+        });
+
+        // 修改密码表单
+        const passwordForm = document.getElementById('passwordForm');
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+            
+            if (newPassword !== confirmNewPassword) {
+                alert('两次输入的新密码不一致！');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                alert('新密码长度至少6位！');
+                return;
+            }
+            
+            alert('密码修改成功！请重新登录');
+            // 模拟退出登录
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1000);
+        });
+
+        // 退出登录功能
+        const logoutBtn = document.getElementById('logoutBtn');
+        const logoutModal = document.getElementById('logoutModal');
+        const cancelLogout = document.getElementById('cancelLogout');
+        const confirmLogout = document.getElementById('confirmLogout');
+
+        logoutBtn.addEventListener('click', () => {
+            logoutModal.classList.remove('hidden');
+        });
+
+        cancelLogout.addEventListener('click', () => {
+            logoutModal.classList.add('hidden');
+        });
+
+        confirmLogout.addEventListener('click', () => {
+            // 清除登录状态
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            alert('已成功退出登录');
+            // 跳转到首页
+            window.location.href = 'index.html';
+        });
+
+        // 点击弹窗外部关闭弹窗
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                logoutModal.classList.add('hidden');
+            }
+        });
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>

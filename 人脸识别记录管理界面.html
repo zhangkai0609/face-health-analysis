@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人脸识别记录管理 - 人脸识别与健康关联分析系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#0FC6C2',
+                        success: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        dark: '#1D2129',
+                        'gray-100': '#F2F3F5',
+                        'gray-200': '#E5E6EB',
+                        'gray-300': '#C9CDD4',
+                        'gray-400': '#86909C',
+                        'gray-500': '#4E5969',
+                        'gray-600': '#272E3B',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sidebar-item-active {
+                @apply bg-primary/10 text-primary border-l-4 border-primary;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+            }
+            .btn-outline {
+                @apply border border-gray-300 hover:border-primary text-gray-600 hover:text-primary font-medium py-2 px-4 rounded-lg transition-all duration-200;
+            }
+            .btn-danger {
+                @apply bg-danger hover:bg-danger/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+            }
+            .btn-disabled {
+                @apply bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed;
+            }
+            .table-row-hover {
+                @apply hover:bg-gray-50 transition-colors duration-150;
+            }
+            .input-field {
+                @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
+            }
+            .select-field {
+                @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-white;
+            }
+            .card {
+                @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
+            }
+            .status-success {
+                @apply bg-success/10 text-success px-2 py-1 rounded-full text-xs font-medium;
+            }
+            .status-warning {
+                @apply bg-warning/10 text-warning px-2 py-1 rounded-full text-xs font-medium;
+            }
+            .status-danger {
+                @apply bg-danger/10 text-danger px-2 py-1 rounded-full text-xs font-medium;
+            }
+            .confidence-bar {
+                @apply h-2 rounded-full bg-gray-200 overflow-hidden;
+            }
+            .confidence-fill {
+                @apply h-full rounded-full transition-all duration-300;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-600 min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-30">
+        <div class="flex items-center justify-between h-16 px-6">
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fa fa-id-card text-white text-lg"></i>
+                    </div>
+                    <h1 class="text-lg font-semibold text-dark">人脸识别与健康关联分析系统</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="text-gray-500 hover:text-primary transition-colors">
+                    <i class="fa fa-bell-o text-lg"></i>
+                </button>
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span class="font-medium">管理员</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 pt-16">
+        <!-- 侧边栏 -->
+        <aside class="w-64 bg-white border-r border-gray-200 fixed left-0 top-16 bottom-0 overflow-y-auto">
+            <nav class="py-4">
+                <div class="px-4 mb-4">
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">系统管理</h2>
+                </div>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-users w-5 text-center mr-3"></i>
+                            <span>用户管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-item-active flex items-center px-4 py-3 text-sm">
+                            <i class="fa fa-camera w-5 text-center mr-3"></i>
+                            <span>人脸识别管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-heartbeat w-5 text-center mr-3"></i>
+                            <span>健康数据管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-bar-chart w-5 text-center mr-3"></i>
+                            <span>数据分析统计</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-cog w-5 text-center mr-3"></i>
+                            <span>系统设置</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <main class="flex-1 ml-64 p-6">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-dark">人脸识别记录管理</h2>
+                <p class="text-gray-500 mt-1">管理系统所有人脸采集记录，支持查看详情、单条删除和批量删除操作</p>
+            </div>
+
+            <!-- 搜索和筛选区域 -->
+            <div class="card mb-6">
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">用户名</label>
+                            <input type="text" placeholder="请输入用户名" class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">采集开始时间</label>
+                            <input type="datetime-local" class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">采集结束时间</label>
+                            <input type="datetime-local" class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">检测结果</label>
+                            <select class="select-field">
+                                <option value="">全部</option>
+                                <option value="success">识别成功</option>
+                                <option value="warning">低置信度</option>
+                                <option value="danger">识别失败</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end space-x-2">
+                            <button class="btn-primary">
+                                <i class="fa fa-search mr-2"></i>搜索
+                            </button>
+                            <button class="btn-outline">
+                                <i class="fa fa-refresh mr-2"></i>重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 人脸识别记录列表区域 -->
+            <div class="card">
+                <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-4">
+                        <h3 class="text-lg font-semibold text-dark">人脸识别记录列表</h3>
+                        <button id="batchDeleteBtn" class="btn-danger btn-disabled" disabled>
+                            <i class="fa fa-trash mr-2"></i>批量删除
+                        </button>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        已选择 <span id="selectedCount" class="font-medium text-primary">0</span> 条记录
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50 text-left">
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 w-12">
+                                    <input type="checkbox" id="selectAll" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary">
+                                </th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500">ID</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500">关联用户名</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500">采集时间</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500">检测结果</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 w-32">置信度</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500">图像存储路径</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500">关联健康数据</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 text-right">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-200 table-row-hover">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" class="record-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" data-id="1">
+                                </td>
+                                <td class="px-4 py-4 text-sm">1</td>
+                                <td class="px-4 py-4 text-sm">张三</td>
+                                <td class="px-4 py-4 text-sm">2024-05-10 08:30:15</td>
+                                <td class="px-4 py-4 text-sm"><span class="status-success">识别成功</span></td>
+                                <td class="px-4 py-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="confidence-bar flex-1 mr-2">
+                                            <div class="confidence-fill bg-success" style="width: 96.8%"></div>
+                                        </div>
+                                        <span class="text-xs">96.8%</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-400 truncate max-w-[150px]" title="/uploads/faces/20240510/face_001.jpg">
+                                    /uploads/faces/20240510/face_001.jpg
+                                </td>
+                                <td class="px-4 py-4 text-sm">
+                                    <a href="#" class="text-primary hover:underline">查看健康报告</a>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-right">
+                                    <button class="view-btn text-primary hover:text-primary/80 mr-3 transition-colors" data-id="1">
+                                        <i class="fa fa-eye"></i> 详情
+                                    </button>
+                                    <button class="delete-btn text-danger hover:text-danger/80 transition-colors" data-id="1">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-200 table-row-hover">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" class="record-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" data-id="2">
+                                </td>
+                                <td class="px-4 py-4 text-sm">2</td>
+                                <td class="px-4 py-4 text-sm">李四</td>
+                                <td class="px-4 py-4 text-sm">2024-05-10 09:15:42</td>
+                                <td class="px-4 py-4 text-sm"><span class="status-warning">低置信度</span></td>
+                                <td class="px-4 py-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="confidence-bar flex-1 mr-2">
+                                            <div class="confidence-fill bg-warning" style="width: 72.3%"></div>
+                                        </div>
+                                        <span class="text-xs">72.3%</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-400 truncate max-w-[150px]" title="/uploads/faces/20240510/face_002.jpg">
+                                    /uploads/faces/20240510/face_002.jpg
+                                </td>
+                                <td class="px-4 py-4 text-sm">
+                                    <a href="#" class="text-primary hover:underline">查看健康报告</a>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-right">
+                                    <button class="view-btn text-primary hover:text-primary/80 mr-3 transition-colors" data-id="2">
+                                        <i class="fa fa-eye"></i> 详情
+                                    </button>
+                                    <button class="delete-btn text-danger hover:text-danger/80 transition-colors" data-id="2">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-200 table-row-hover">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" class="record-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" data-id="3">
+                                </td>
+                                <td class="px-4 py-4 text-sm">3</td>
+                                <td class="px-4 py-4 text-sm">未知用户</td>
+                                <td class="px-4 py-4 text-sm">2024-05-10 10:00:08</td>
+                                <td class="px-4 py-4 text-sm"><span class="status-danger">识别失败</span></td>
+                                <td class="px-4 py-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="confidence-bar flex-1 mr-2">
+                                            <div class="confidence-fill bg-danger" style="width: 35.6%"></div>
+                                        </div>
+                                        <span class="text-xs">35.6%</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-400 truncate max-w-[150px]" title="/uploads/faces/20240510/face_003.jpg">
+                                    /uploads/faces/20240510/face_003.jpg
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-400">无关联</td>
+                                <td class="px-4 py-4 text-sm text-right">
+                                    <button class="view-btn text-primary hover:text-primary/80 mr-3 transition-colors" data-id="3">
+                                        <i class="fa fa-eye"></i> 详情
+                                    </button>
+                                    <button class="delete-btn text-danger hover:text-danger/80 transition-colors" data-id="3">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-200 table-row-hover">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" class="record-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" data-id="4">
+                                </td>
+                                <td class="px-4 py-4 text-sm">4</td>
+                                <td class="px-4 py-4 text-sm">张三</td>
+                                <td class="px-4 py-4 text-sm">2024-05-11 14:20:33</td>
+                                <td class="px-4 py-4 text-sm"><span class="status-success">识别成功</span></td>
+                                <td class="px-4 py-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="confidence-bar flex-1 mr-2">
+                                            <div class="confidence-fill bg-success" style="width: 98.2%"></div>
+                                        </div>
+                                        <span class="text-xs">98.2%</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-400 truncate max-w-[150px]" title="/uploads/faces/20240511/face_001.jpg">
+                                    /uploads/faces/20240511/face_001.jpg
+                                </td>
+                                <td class="px-4 py-4 text-sm">
+                                    <a href="#" class="text-primary hover:underline">查看健康报告</a>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-right">
+                                    <button class="view-btn text-primary hover:text-primary/80 mr-3 transition-colors" data-id="4">
+                                        <i class="fa fa-eye"></i> 详情
+                                    </button>
+                                    <button class="delete-btn text-danger hover:text-danger/80 transition-colors" data-id="4">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-200 table-row-hover">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" class="record-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" data-id="5">
+                                </td>
+                                <td class="px-4 py-4 text-sm">5</td>
+                                <td class="px-4 py-4 text-sm">赵六</td>
+                                <td class="px-4 py-4 text-sm">2024-05-12 09:45:19</td>
+                                <td class="px-4 py-4 text-sm"><span class="status-success">识别成功</span></td>
+                                <td class="px-4 py-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="confidence-bar flex-1 mr-2">
+                                            <div class="confidence-fill bg-success" style="width: 94.5%"></div>
+                                        </div>
+                                        <span class="text-xs">94.5%</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-400 truncate max-w-[150px]" title="/uploads/faces/20240512/face_001.jpg">
+                                    /uploads/faces/20240512/face_001.jpg
+                                </td>
+                                <td class="px-4 py-4 text-sm">
+                                    <a href="#" class="text-primary hover:underline">查看健康报告</a>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-right">
+                                    <button class="view-btn text-primary hover:text-primary/80 mr-3 transition-colors" data-id="5">
+                                        <i class="fa fa-eye"></i> 详情
+                                    </button>
+                                    <button class="delete-btn text-danger hover:text-danger/80 transition-colors" data-id="5">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 分页 -->
+                <div class="flex justify-between items-center p-6 border-t border-gray-200">
+                    <div class="text-sm text-gray-500">
+                        共 <span class="font-medium">326</span> 条记录，当前第 <span class="font-medium">1</span> 页 / 共 <span class="font-medium">66</span> 页
+                    </div>
+                    <div class="flex space-x-1">
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-400 cursor-not-allowed">上一页</button>
+                        <button class="px-3 py-1 bg-primary text-white rounded text-sm">1</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">2</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">3</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">4</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">5</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 查看详情弹窗 -->
+    <div id="detailModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl transform transition-all max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white">
+                <h3 id="modalTitle" class="text-lg font-semibold text-dark">人脸识别记录详情</h3>
+                <button id="closeDetailModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 人脸图片区域 -->
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500 mb-3">采集人脸图像</h4>
+                        <div class="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center h-64">
+                            <img src="https://picsum.photos/400/300" alt="人脸采集图像" class="max-w-full max-h-full object-contain">
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">点击图片可查看原图</p>
+                    </div>
+                    
+                    <!-- 基本信息区域 -->
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500 mb-3">基本信息</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">记录ID:</span>
+                                <span id="detailId" class="font-medium">1</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">关联用户名:</span>
+                                <span id="detailUsername" class="font-medium">张三</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">采集时间:</span>
+                                <span id="detailTime" class="font-medium">2024-05-10 08:30:15</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">检测结果:</span>
+                                <span id="detailStatus" class="status-success">识别成功</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">置信度:</span>
+                                <span id="detailConfidence" class="font-medium text-success">96.8%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">设备ID:</span>
+                                <span id="detailDevice" class="font-medium">CAM-001</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">采集地点:</span>
+                                <span id="detailLocation" class="font-medium">一号入口</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 检测参数区域 -->
+                <div class="mt-6">
+                    <h4 class="text-sm font-medium text-gray-500 mb-3">详细检测参数</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs text-gray-400 mb-1">人脸宽度</p>
+                            <p class="font-medium">245px</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs text-gray-400 mb-1">人脸高度</p>
+                            <p class="font-medium">287px</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs text-gray-400 mb-1">人脸角度</p>
+                            <p class="font-medium">3.2°</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs text-gray-400 mb-1">光照强度</p>
+                            <p class="font-medium">良好</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs text-gray-400 mb-1">年龄预测</p>
+                            <p class="font-medium">28岁</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs text-gray-400 mb-1">性别预测</p>
+                            <p class="font-medium">男</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs text-gray-400 mb-1">表情状态</p>
+                            <p class="font-medium">中性</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                            <p class="text-xs text-gray-400 mb-1">是否戴口罩</p>
+                            <p class="font-medium">否</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 关联信息区域 -->
+                <div class="mt-6">
+                    <h4 class="text-sm font-medium text-gray-500 mb-3">关联信息</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">图像存储路径:</span>
+                            <span id="detailPath" class="font-medium text-gray-400">/uploads/faces/20240510/face_001.jpg</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">关联健康数据ID:</span>
+                            <a href="#" class="text-primary hover:underline">HEALTH-20240510-001</a>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">创建时间:</span>
+                            <span class="font-medium">2024-05-10 08:30:15</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">最后更新时间:</span>
+                            <span class="font-medium">2024-05-10 08:30:15</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end mt-6 pt-4 border-t border-gray-200">
+                    <button id="closeDetailBtn" class="btn-primary">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md transform transition-all">
+            <div class="p-6">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-16 h-16 rounded-full bg-danger/10 flex items-center justify-center">
+                        <i class="fa fa-exclamation-triangle text-3xl text-danger"></i>
+                    </div>
+                </div>
+                <h3 id="deleteModalTitle" class="text-lg font-semibold text-dark text-center mb-2">确认删除</h3>
+                <p id="deleteModalText" class="text-gray-500 text-center mb-6">
+                    您确定要删除这条人脸识别记录吗？删除后该条记录将被永久删除且无法恢复。
+                </p>
+                <div class="flex justify-center space-x-3">
+                    <button id="cancelDelete" class="btn-outline px-6">取消</button>
+                    <button id="confirmDelete" class="btn-danger px-6">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轮播图管理 - 人脸识别与健康关联分析系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#0FC6C2',
+                        success: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        info: '#4080FF',
+                        dark: '#1D2129',
+                        'gray-100': '#F2F3F5',
+                        'gray-200': '#E5E6EB',
+                        'gray-300': '#C9CDD4',
+                        'gray-400': '#86909C',
+                        'gray-500': '#4E5969',
+                        'gray-600': '#272E3B',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sidebar-item-active {
+                @apply bg-primary/10 text-primary border-l-4 border-primary;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+            }
+            .btn-outline {
+                @apply border border-gray-300 hover:border-primary text-gray-600 hover:text-primary font-medium py-2 px-4 rounded-lg transition-all duration-200;
+            }
+            .btn-danger {
+                @apply bg-danger hover:bg-danger/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+            }
+            .btn-success {
+                @apply bg-success hover:bg-success/90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+            }
+            .btn-disabled {
+                @apply bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed;
+            }
+            .table-row-hover {
+                @apply hover:bg-gray-50 transition-colors duration-150;
+            }
+            .input-field {
+                @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
+            }
+            .select-field {
+                @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-white;
+            }
+            .card {
+                @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden;
+            }
+            .status-enabled {
+                @apply bg-success/10 text-success px-2 py-1 rounded-full text-xs font-medium;
+            }
+            .status-disabled {
+                @apply bg-gray-100 text-gray-500 px-2 py-1 rounded-full text-xs font-medium;
+            }
+            .dragging {
+                @apply opacity-50 bg-blue-50;
+            }
+            .drag-over {
+                @apply border-t-2 border-primary;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-600 min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-30">
+        <div class="flex items-center justify-between h-16 px-6">
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fa fa-id-card text-white text-lg"></i>
+                    </div>
+                    <h1 class="text-lg font-semibold text-dark">人脸识别与健康关联分析系统</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="text-gray-500 hover:text-primary transition-colors">
+                    <i class="fa fa-bell-o text-lg"></i>
+                </button>
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <span class="font-medium">管理员</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 pt-16">
+        <!-- 侧边栏 -->
+        <aside class="w-64 bg-white border-r border-gray-200 fixed left-0 top-16 bottom-0 overflow-y-auto">
+            <nav class="py-4">
+                <div class="px-4 mb-4">
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">系统管理</h2>
+                </div>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-users w-5 text-center mr-3"></i>
+                            <span>用户管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-camera w-5 text-center mr-3"></i>
+                            <span>人脸识别管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-heartbeat w-5 text-center mr-3"></i>
+                            <span>健康数据管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-file-text-o w-5 text-center mr-3"></i>
+                            <span>健康报告管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-bullhorn w-5 text-center mr-3"></i>
+                            <span>公告管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-item-active flex items-center px-4 py-3 text-sm">
+                            <i class="fa fa-picture-o w-5 text-center mr-3"></i>
+                            <span>轮播图管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-bar-chart w-5 text-center mr-3"></i>
+                            <span>数据分析统计</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                            <i class="fa fa-cog w-5 text-center mr-3"></i>
+                            <span>系统设置</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <main class="flex-1 ml-64 p-6">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-dark">轮播图管理</h2>
+                <p class="text-gray-500 mt-1">管理首页轮播图内容，支持上传、编辑、拖拽排序和批量操作</p>
+                <p class="text-sm text-primary mt-1"><i class="fa fa-info-circle mr-1"></i> 提示：拖拽表格行可调整轮播图显示顺序</p>
+            </div>
+
+            <!-- 搜索和筛选区域 -->
+            <div class="card mb-6">
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">轮播图标题</label>
+                            <input type="text" placeholder="请输入标题关键词" class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">发布开始时间</label>
+                            <input type="date" class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">发布结束时间</label>
+                            <input type="date" class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">启用状态</label>
+                            <select class="select-field">
+                                <option value="">全部</option>
+                                <option value="enabled">已启用</option>
+                                <option value="disabled">已禁用</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end space-x-2">
+                            <button class="btn-primary">
+                                <i class="fa fa-search mr-2"></i>搜索
+                            </button>
+                            <button class="btn-outline">
+                                <i class="fa fa-refresh mr-2"></i>重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 轮播图列表区域 -->
+            <div class="card">
+                <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-4">
+                        <h3 class="text-lg font-semibold text-dark">轮播图列表</h3>
+                        <button id="batchDeleteBtn" class="btn-danger btn-disabled" disabled>
+                            <i class="fa fa-trash mr-2"></i>批量删除
+                        </button>
+                        <button id="batchEnableBtn" class="btn-success btn-disabled" disabled>
+                            <i class="fa fa-check mr-2"></i>批量启用
+                        </button>
+                        <button id="batchDisableBtn" class="btn-outline btn-disabled" disabled>
+                            <i class="fa fa-ban mr-2"></i>批量禁用
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-sm text-gray-500">
+                            已选择 <span id="selectedCount" class="font-medium text-primary">0</span> 条记录
+                        </div>
+                        <button id="addCarouselBtn" class="btn-primary">
+                            <i class="fa fa-plus mr-2"></i>添加轮播图
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full" id="carouselTable">
+                        <thead>
+                            <tr class="bg-gray-50 text-left">
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 w-12">
+                                    <input type="checkbox" id="selectAll" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary">
+                                </th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 w-12">排序</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 w-32">轮播图</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500">标题</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 w-48">跳转链接</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 w-20">显示顺序</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 w-20">状态</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 w-32">创建时间</th>
+                                <th class="px-4 py-3 text-sm font-medium text-gray-500 text-right">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="carouselTbody">
+                            <tr class="border-b border-gray-200 table-row-hover" draggable="true" data-id="1" data-sort="1">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" class="record-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" data-id="1">
+                                </td>
+                                <td class="px-4 py-4 text-gray-400 cursor-move">
+                                    <i class="fa fa-bars"></i>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <img src="https://picsum.photos/seed/carousel1/120/60" alt="轮播图" class="w-24 h-12 object-cover rounded border border-gray-200">
+                                </td>
+                                <td class="px-4 py-4 text-sm font-medium">人脸识别与健康分析系统正式上线</td>
+                                <td class="px-4 py-4 text-sm text-gray-400 truncate max-w-[150px]" title="/home">/home</td>
+                                <td class="px-4 py-4 text-sm">1</td>
+                                <td class="px-4 py-4 text-sm"><span class="status-enabled">已启用</span></td>
+                                <td class="px-4 py-4 text-sm">2024-05-01</td>
+                                <td class="px-4 py-4 text-sm text-right">
+                                    <button class="preview-btn text-primary hover:text-primary/80 mr-2 transition-colors" data-id="1">
+                                        <i class="fa fa-eye"></i> 预览
+                                    </button>
+                                    <button class="edit-btn text-secondary hover:text-secondary/80 mr-2 transition-colors" data-id="1">
+                                        <i class="fa fa-pencil"></i> 编辑
+                                    </button>
+                                    <button class="delete-btn text-danger hover:text-danger/80 transition-colors" data-id="1">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-200 table-row-hover" draggable="true" data-id="2" data-sort="2">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" class="record-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" data-id="2">
+                                </td>
+                                <td class="px-4 py-4 text-gray-400 cursor-move">
+                                    <i class="fa fa-bars"></i>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <img src="https://picsum.photos/seed/carousel2/120/60" alt="轮播图" class="w-24 h-12 object-cover rounded border border-gray-200">
+                                </td>
+                                <td class="px-4 py-4 text-sm font-medium">AI健康检测 一秒知健康</td>
+                                <td class="px-4 py-4 text-sm text-gray-400 truncate max-w-[150px]" title="/health-detection">/health-detection</td>
+                                <td class="px-4 py-4 text-sm">2</td>
+                                <td class="px-4 py-4 text-sm"><span class="status-enabled">已启用</span></td>
+                                <td class="px-4 py-4 text-sm">2024-05-03</td>
+                                <td class="px-4 py-4 text-sm text-right">
+                                    <button class="preview-btn text-primary hover:text-primary/80 mr-2 transition-colors" data-id="2">
+                                        <i class="fa fa-eye"></i> 预览
+                                    </button>
+                                    <button class="edit-btn text-secondary hover:text-secondary/80 mr-2 transition-colors" data-id="2">
+                                        <i class="fa fa-pencil"></i> 编辑
+                                    </button>
+                                    <button class="delete-btn text-danger hover:text-danger/80 transition-colors" data-id="2">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-200 table-row-hover" draggable="true" data-id="3" data-sort="3">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" class="record-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" data-id="3">
+                                </td>
+                                <td class="px-4 py-4 text-gray-400 cursor-move">
+                                    <i class="fa fa-bars"></i>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <img src="https://picsum.photos/seed/carousel3/120/60" alt="轮播图" class="w-24 h-12 object-cover rounded border border-gray-200">
+                                </td>
+                                <td class="px-4 py-4 text-sm font-medium">夏季健康防护指南</td>
+                                <td class="px-4 py-4 text-sm text-gray-400 truncate max-w-[150px]" title="/health-guide">/health-guide</td>
+                                <td class="px-4 py-4 text-sm">3</td>
+                                <td class="px-4 py-4 text-sm"><span class="status-disabled">已禁用</span></td>
+                                <td class="px-4 py-4 text-sm">2024-05-05</td>
+                                <td class="px-4 py-4 text-sm text-right">
+                                    <button class="preview-btn text-primary hover:text-primary/80 mr-2 transition-colors" data-id="3">
+                                        <i class="fa fa-eye"></i> 预览
+                                    </button>
+                                    <button class="edit-btn text-secondary hover:text-secondary/80 mr-2 transition-colors" data-id="3">
+                                        <i class="fa fa-pencil"></i> 编辑
+                                    </button>
+                                    <button class="delete-btn text-danger hover:text-danger/80 transition-colors" data-id="3">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-200 table-row-hover" draggable="true" data-id="4" data-sort="4">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" class="record-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" data-id="4">
+                                </td>
+                                <td class="px-4 py-4 text-gray-400 cursor-move">
+                                    <i class="fa fa-bars"></i>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <img src="https://picsum.photos/seed/carousel4/120/60" alt="轮播图" class="w-24 h-12 object-cover rounded border border-gray-200">
+                                </td>
+                                <td class="px-4 py-4 text-sm font-medium">系统使用教程</td>
+                                <td class="px-4 py-4 text-sm text-gray-400 truncate max-w-[150px]" title="/tutorial">/tutorial</td>
+                                <td class="px-4 py-4 text-sm">4</td>
+                                <td class="px-4 py-4 text-sm"><span class="status-enabled">已启用</span></td>
+                                <td class="px-4 py-4 text-sm">2024-05-08</td>
+                                <td class="px-4 py-4 text-sm text-right">
+                                    <button class="preview-btn text-primary hover:text-primary/80 mr-2 transition-colors" data-id="4">
+                                        <i class="fa fa-eye"></i> 预览
+                                    </button>
+                                    <button class="edit-btn text-secondary hover:text-secondary/80 mr-2 transition-colors" data-id="4">
+                                        <i class="fa fa-pencil"></i> 编辑
+                                    </button>
+                                    <button class="delete-btn text-danger hover:text-danger/80 transition-colors" data-id="4">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-200 table-row-hover" draggable="true" data-id="5" data-sort="5">
+                                <td class="px-4 py-4">
+                                    <input type="checkbox" class="record-checkbox w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" data-id="5">
+                                </td>
+                                <td class="px-4 py-4 text-gray-400 cursor-move">
+                                    <i class="fa fa-bars"></i>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <img src="https://picsum.photos/seed/carousel5/120/60" alt="轮播图" class="w-24 h-12 object-cover rounded border border-gray-200">
+                                </td>
+                                <td class="px-4 py-4 text-sm font-medium">新版本功能预告</td>
+                                <td class="px-4 py-4 text-sm text-gray-400 truncate max-w-[150px]" title="/new-features">/new-features</td>
+                                <td class="px-4 py-4 text-sm">5</td>
+                                <td class="px-4 py-4 text-sm"><span class="status-disabled">已禁用</span></td>
+                                <td class="px-4 py-4 text-sm">2024-05-10</td>
+                                <td class="px-4 py-4 text-sm text-right">
+                                    <button class="preview-btn text-primary hover:text-primary/80 mr-2 transition-colors" data-id="5">
+                                        <i class="fa fa-eye"></i> 预览
+                                    </button>
+                                    <button class="edit-btn text-secondary hover:text-secondary/80 mr-2 transition-colors" data-id="5">
+                                        <i class="fa fa-pencil"></i> 编辑
+                                    </button>
+                                    <button class="delete-btn text-danger hover:text-danger/80 transition-colors" data-id="5">
+                                        <i class="fa fa-trash"></i> 删除
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 分页 -->
+                <div class="flex justify-between items-center p-6 border-t border-gray-200">
+                    <div class="text-sm text-gray-500">
+                        共 <span class="font-medium">12</span> 条记录，当前第 <span class="font-medium">1</span> 页 / 共 <span class="font-medium">3</span> 页
+                    </div>
+                    <div class="flex space-x-1">
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-400 cursor-not-allowed">上一页</button>
+                        <button class="px-3 py-1 bg-primary text-white rounded text-sm">1</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">2</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">3</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 添加/编辑轮播图弹窗 -->
+    <div id="editModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl transform transition-all max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white">
+                <h3 id="editModalTitle" class="text-lg font-semibold text-dark">添加轮播图</h3>
+                <button id="closeEditModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="editForm" class="p-6 space-y-4">
+                <input type="hidden" id="carouselId">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">轮播图图片 <span class="text-danger">*</span></label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer" id="uploadArea">
+                        <input type="file" id="carouselImage" accept="image/*" class="hidden">
+                        <div id="uploadPlaceholder">
+                            <i class="fa fa-cloud-upload text-4xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-500">点击或拖拽上传图片</p>
+                            <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，建议尺寸1920×500px</p>
+                        </div>
+                        <div id="imagePreview" class="hidden">
+                            <img src="" alt="预览图" class="max-w-full max-h-48 mx-auto rounded">
+                            <p class="text-sm text-gray-500 mt-2">点击重新上传</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">轮播图标题 <span class="text-danger">*</span></label>
+                    <input type="text" id="carouselTitle" placeholder="请输入轮播图标题" class="input-field" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">跳转链接</label>
+                    <input type="text" id="carouselLink" placeholder="请输入跳转链接（如：/home）" class="input-field">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">显示顺序</label>
+                        <input type="number" id="carouselSort" placeholder="请输入数字" class="input-field" value="1" min="1">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">启用状态</label>
+                        <select id="carouselStatus" class="select-field">
+                            <option value="enabled">启用</option>
+                            <option value="disabled">禁用</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" id="cancelEditBtn" class="btn-outline">取消</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 预览轮播图弹窗 -->
+    <div id="previewModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl transform transition-all">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-dark">轮播图预览</h3>
+                <button id="closePreviewModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="relative rounded-lg overflow-hidden">
+                    <img id="previewImage" src="https://picsum.photos/seed/carousel1/1920/500" alt="轮播图预览" class="w-full">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                        <h2 id="previewTitle" class="text-white text-2xl font-bold">人脸识别与健康分析系统正式上线</h2>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <p class="text-gray-500">跳转链接：<span id="previewLink" class="text-primary">/home</span></p>
+                </div>
+                <div class="flex justify-end mt-6 pt-4 border-t border-gray-200">
+                    <button id="closePreviewBtn" class="btn-primary">关闭预览</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md transform transition-all">
+            <div class="p-6">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-16 h-16 rounded-full bg-danger/10 flex items-center justify-center">
+                        <i class="fa fa-exclamation-triangle text-3xl text-danger"></i>
+                    </div>
+                </div>
+                <h3 id="deleteModalTitle" class="text-lg font-semibold text-dark text-center mb-2">确认删除</h3>
+                <p id="deleteModalText" class="text-gray-500 text-center mb-6">
+                    您确定要删除这张轮播图吗？删除后该轮播图将从系统中永久移除且无法恢复。
+                </p>
+                <div class="flex justify-center space-x-3">
+                    <button id="cancelDelete" class="btn-outline px-6">取消</button>
+                    <button id="confirmDelete" class="btn-danger px-6">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量操作确认弹窗 -->
+    <div id="batchConfirmModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md transform transition-all">
+            <div class="p-6">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                        <i id="batchConfirmIcon" class="fa fa-check text-3xl text-primary"></i>
+                    </div>
+                </div>
+                <h3 id="batchConfirmTitle" class="text-lg font-semibold text-dark text-center mb-2">确认操作</h3>
+                <p id="batchConfirmText" class="text-gray-500 text-center mb-6">
+                    您确定要对选中的 <span id="batchCount" class="font-medium text-primary">0</span> 条记录执行此操作吗？
+                </p>
+                <div class="flex justify-center space-x-3">
+                    <button id="cancelBatch" class="btn-outline px-6">取消</button>
+                    <button id="confirmBatch" class="btn-primary px-6">确认执行</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
