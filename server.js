@@ -6,8 +6,8 @@ const { URL } = require("node:url");
 const { DatabaseSync } = require("node:sqlite");
 
 const BASE_DIR = __dirname;
-const DB_PATH = path.join(BASE_DIR, "app.db");
-const HOST = "127.0.0.1";
+const DB_PATH = process.env.DB_PATH || path.join(BASE_DIR, "app.db");
+const HOST = "0.0.0.0";
 const PORT = Number(process.env.PORT || 8000);
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "admin123456";
@@ -153,7 +153,7 @@ function initDb() {
     ensureColumn("face_records", "image_path", "TEXT DEFAULT ''");
 
     const userCount = db.prepare("SELECT COUNT(*) AS total FROM users").get().total;
-    if (userCount > 0) {
+    if (userCount > 0 && !process.env.RENDER) {
         seedAdminSamples();
         return;
     }
@@ -916,8 +916,8 @@ const server = http.createServer((request, response) => {
     serveStatic(request, response, pathname);
 });
 
-server.listen(PORT, "0.0.0.0", () => {
-    console.log(`服务已启动：http://0.0.0.0:${PORT}/`);
+server.listen(PORT, HOST, () => {
+    console.log(`服务已启动：http://${HOST}:${PORT}/`);
     console.log(`数据库文件：${DB_PATH}`);
     console.log("测试账号：zhangsan / 123456");
 });

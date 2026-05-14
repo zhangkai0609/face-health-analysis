@@ -11,3 +11,7 @@ services:
         value: 10000
       - key: NODE_VERSION
         value: 22
+      - key: RENDER
+        value: "true"
+      - key: DB_PATH
+        value: /tmp/app.db
