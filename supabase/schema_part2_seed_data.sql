@@ -1,0 +1,59 @@
+insert into public.users
+    (id, username, password_hash, salt, real_name, gender, phone, email, role, status, created_at, updated_at)
+values
+    (1, 'zhangsan', 'd3b0292461f6886d3235f9f1e3b6b1819937d92c2df4b6c3356ae79526f0a2ba', 'seed_zhangsan', 'normal', 'male', '13800138001', 'zhangsan@example.com', 'admin', 'normal', '2026-05-14 09:00:00', '2026-05-14 09:00:00'),
+    (2, 'lisi', 'c9ed0b1c79d499ecf1e228921c13fb55574f8a911732257128d99d4df6f12d78', 'seed_lisi', 'normal', 'female', '13900139002', 'lisi@example.com', 'user', 'normal', '2026-05-14 09:10:00', '2026-05-14 09:10:00'),
+    (3, 'wangwu', 'ca3f7335d0bdb4b9291c98ae81913b0b88c7b2ff23699d1538d2f0ed57ce77d5', 'seed_wangwu', 'normal', 'male', '13700137003', 'wangwu@example.com', 'user', 'normal', '2026-05-14 09:20:00', '2026-05-14 09:20:00')
+on conflict (id) do nothing;
+
+insert into public.carousel_items
+    (id, title, subtitle, image_url, link_url, sort_order, status, created_at)
+values
+    (1, 'normal', 'normal', 'https://picsum.photos/seed/carousel1/1920/500', 'text.html', 1, 'normal', '2026-05-01'),
+    (2, 'AItext text', 'normal', 'https://picsum.photos/seed/carousel2/1920/500', 'text.html', 2, 'normal', '2026-05-03'),
+    (3, 'normal', 'normal', 'https://picsum.photos/seed/carousel3/1920/500', 'text.html', 3, 'normal', '2026-05-05'),
+    (4, 'normal', 'normal', 'https://picsum.photos/seed/carousel4/1920/500', 'text.html', 4, 'normal', '2026-05-08'),
+    (5, 'normal', 'normal', 'https://picsum.photos/seed/carousel5/1920/500', 'text.html', 5, 'normal', '2026-05-10')
+on conflict (id) do nothing;
+
+insert into public.announcements
+    (id, title, content, category, status, published_at, is_top, views, updated_at)
+values
+    (1, 'normal', 'text Supabase text', 'normal', 'normal', '2026-05-14 10:00:00', 1, 128, '2026-05-14 10:00:00'),
+    (2, 'normal', 'normal', 'normal', 'normal', '2026-05-12 09:30:00', 0, 76, '2026-05-12 09:30:00')
+on conflict (id) do nothing;
+
+insert into public.health_data
+    (id, user_id, user_name, height_cm, weight_kg, heart_rate, systolic_bp, diastolic_bp, blood_oxygen, temperature, risk_level, face_id, analysis_result, remarks, measured_at)
+values
+    (1, 1, 'normal', 175, 68.5, 76, 118, 76, 98, 36.5, 'normal', 'FACE-20260512001', 'normal', 'normal', '2026-05-12 08:32:00'),
+    (2, 1, 'normal', 175, 68.8, 82, 123, 80, 97, 36.7, 'normal', 'FACE-20260513001', 'normal', 'normal', '2026-05-13 08:31:00'),
+    (3, 2, 'normal', 162, 54.2, 74, 116, 75, 99, 36.4, 'normal', 'FACE-20260513002', 'normal', 'normal', '2026-05-13 09:12:00')
+on conflict (id) do nothing;
+
+insert into public.health_reports
+    (id, user_id, report_no, report_title, summary, risk_level, status, report_date, heart_rate, blood_pressure, blood_oxygen, temperature, suggestions, face_id, health_data_id, created_at, updated_at)
+values
+    (1, 1, 'HR-20260501-0001', '2026text', 'normal', 'normal', 'normal', '2026-05-01', 76, '118/76', 98, 36.5, 'normal', 'FACE-20260512001', '1', '2026-05-01 10:00:00', '2026-05-01 10:00:00'),
+    (2, 1, 'HR-20260510-0002', 'normal', 'normal', 'text(text)', 'normal', '2026-05-10', 82, '123/80', 97, 36.7, 'normal', 'FACE-20260513001', '2', '2026-05-10 10:00:00', '2026-05-10 10:00:00'),
+    (3, 2, 'HR-20260422-0003', 'normal', 'normal', 'normal', 'normal', '2026-04-22', 74, '116/75', 99, 36.4, 'normal', 'FACE-20260513002', '3', '2026-04-22 10:00:00', '2026-04-22 10:00:00')
+on conflict (id) do nothing;
+
+insert into public.face_records
+    (id, user_id, user_name, recognition_time, similarity, device_name, result, health_status, location, image_path)
+values
+    (1, 1, 'normal', '2026-05-12 08:30:12', 98.7, 'textA01', 'normal', 'normal', 'normal', '/uploads/face-001.jpg'),
+    (2, 1, 'normal', '2026-05-13 08:28:45', 97.9, 'textA01', 'normal', 'normal', 'normal', '/uploads/face-002.jpg'),
+    (3, 2, 'normal', '2026-05-13 09:10:33', 96.5, 'textB02', 'normal', 'normal', 'normal', '/uploads/face-003.jpg')
+on conflict (id) do nothing;
+
+insert into public.app_meta (key, value)
+values ('supabase_seed_v1', '1')
+on conflict (key) do update set value = excluded.value;
+
+select setval(pg_get_serial_sequence('public.users', 'id'), coalesce((select max(id) from public.users), 1));
+select setval(pg_get_serial_sequence('public.carousel_items', 'id'), coalesce((select max(id) from public.carousel_items), 1));
+select setval(pg_get_serial_sequence('public.announcements', 'id'), coalesce((select max(id) from public.announcements), 1));
+select setval(pg_get_serial_sequence('public.health_data', 'id'), coalesce((select max(id) from public.health_data), 1));
+select setval(pg_get_serial_sequence('public.health_reports', 'id'), coalesce((select max(id) from public.health_reports), 1));
+select setval(pg_get_serial_sequence('public.face_records', 'id'), coalesce((select max(id) from public.face_records), 1));

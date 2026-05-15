@@ -1,10 +1,16 @@
 {
   "name": "face-health-analysis-system",
   "version": "1.0.0",
-  "description": "人脸识别与健康关联分析系统课程设计后端服务",
+  "description": "人脸识别与健康关联分析系统课程设计",
   "main": "server.js",
   "scripts": {
-    "start": "node --no-warnings server.js"
+    "build": "node scripts/build.js",
+    "start": "node --no-warnings server.js",
+    "netlify:dev": "netlify dev",
+    "check:function": "node -c netlify/functions/api.js"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "license": "MIT"
 }

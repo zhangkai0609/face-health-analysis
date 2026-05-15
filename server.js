@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const { URL } = require("node:url");
+const { execSync } = require("node:child_process");
 const { DatabaseSync } = require("node:sqlite");
 
 const BASE_DIR = __dirname;
@@ -11,6 +12,9 @@ const HOST = "0.0.0.0";
 const PORT = Number(process.env.PORT || 8000);
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "admin123456";
+
+// 存储公网 URL（由启动脚本或 API 设置）
+let publicUrl = "";
 
 const db = new DatabaseSync(DB_PATH);
 db.exec("PRAGMA foreign_keys = ON");
@@ -662,10 +666,44 @@ function serveStatic(request, response, urlPath) {
     });
 }
 
+function getLocalIp() {
+    try {
+        const interfaces = require("node:os").networkInterfaces();
+        for (const name of Object.keys(interfaces)) {
+            for (const iface of interfaces[name]) {
+                if (iface.family === "IPv4" && !iface.internal) {
+                    return iface.address;
+                }
+            }
+        }
+    } catch {}
+    return "127.0.0.1";
+}
+
 async function handleApi(request, response, pathname) {
     try {
         if (request.method === "GET" && pathname === "/api/health") {
             sendJson(response, 200, { success: true, message: "后端服务运行正常", database: DB_PATH });
+            return;
+        }
+        if (request.method === "GET" && pathname === "/api/public-url") {
+            sendJson(response, 200, {
+                success: true,
+                data: {
+                    publicUrl: publicUrl || "",
+                    localUrl: `http://${getLocalIp()}:${PORT}/`,
+                    localhostUrl: `http://127.0.0.1:${PORT}/`,
+                    port: PORT
+                }
+            });
+            return;
+        }
+        if (request.method === "POST" && pathname === "/api/public-url") {
+            const body = await readBody(request);
+            if (body.url) {
+                publicUrl = String(body.url).trim();
+            }
+            sendJson(response, 200, { success: true, data: { publicUrl } });
             return;
         }
         if (request.method === "GET" && pathname === "/api/users") {

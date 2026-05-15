@@ -1,0 +1,12 @@
+.git/
+.netlify/
+tools/
+app.db
+*.log
+公网访问地址.txt
+公网启动.bat
+公网启动.ps1
+公网停止.bat
+公网停止.ps1
+启动公网访问.bat
+render.yaml

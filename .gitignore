@@ -1,8 +1,12 @@
 node_modules/
+dist/
+tools/
 app.db
 *.db-journal
 *.db-wal
 *.db-shm
+*.log
 .env
+公网访问地址.txt
 .DS_Store
 Thumbs.db

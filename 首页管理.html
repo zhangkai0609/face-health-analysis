@@ -86,6 +86,14 @@
                         <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                     </div>
 
+                    <!-- 公网访问状态 -->
+                    <div id="publicUrlDisplay" class="hidden md:flex items-center mr-2">
+                        <a id="publicUrlLink" href="#" target="_blank" class="text-xs bg-green-50 text-green-600 border border-green-200 rounded-full px-3 py-1 hover:bg-green-100 transition-colors flex items-center">
+                            <i class="fa fa-globe mr-1"></i>
+                            <span id="publicUrlText">公网访问</span>
+                        </a>
+                    </div>
+
                     <!-- 注册/登录按钮 -->
                     <a href="#" class="btn-ghost">注册</a>
                     <a href="#" class="btn-outline">登录</a>
@@ -328,6 +336,45 @@
                 </div>
             </div>
         </section>
+        <!-- 访问方式区域 -->
+        <section class="py-12 bg-gradient-to-r from-primary/5 to-secondary/5 border-t border-gray-200">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h2 class="text-2xl font-bold text-dark mb-6">访问本系统</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fa fa-laptop text-xl text-green-600"></i>
+                            </div>
+                            <h3 class="font-semibold text-dark mb-2">本机访问</h3>
+                            <a id="localHostUrl" href="http://127.0.0.1:8000" target="_blank" class="text-sm text-primary hover:underline break-all">http://127.0.0.1:8000</a>
+                        </div>
+                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fa fa-wifi text-xl text-blue-600"></i>
+                            </div>
+                            <h3 class="font-semibold text-dark mb-2">局域网访问</h3>
+                            <a id="localNetworkUrl" href="#" target="_blank" class="text-sm text-primary hover:underline break-all">获取中...</a>
+                            <p class="text-xs text-gray-400 mt-1">同一 WiFi 下可访问</p>
+                        </div>
+                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-200 relative">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fa fa-globe text-xl text-purple-600"></i>
+                            </div>
+                            <h3 class="font-semibold text-dark mb-2">公网访问</h3>
+                            <a id="publicAccessUrl" href="#" target="_blank" class="text-sm text-primary hover:underline break-all">未启动</a>
+                            <p class="text-xs text-gray-400 mt-1">运行「启动公网访问.bat」即可</p>
+                            <div id="publicAccessBadge" class="absolute -top-2 -right-2 bg-gray-300 text-white text-xs rounded-full px-2 py-0.5">离线</div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-6">
+                        <i class="fa fa-info-circle mr-1"></i>
+                        提示：运行项目目录下的「启动公网访问.bat」即可生成公网链接，无需同一局域网即可访问
+                    </p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- 页脚 -->
@@ -502,6 +549,72 @@
                 }
             });
         });
+
+        // 获取访问地址信息
+        async function fetchAccessUrls() {
+            try {
+                const response = await fetch('/api/public-url');
+                const result = await response.json();
+                if (result.success) {
+                    const data = result.data;
+
+                    // 更新本机访问地址
+                    const localHostEl = document.getElementById('localHostUrl');
+                    if (localHostEl) {
+                        localHostEl.href = data.localhostUrl;
+                        localHostEl.textContent = data.localhostUrl;
+                    }
+
+                    // 更新局域网访问地址
+                    const localNetEl = document.getElementById('localNetworkUrl');
+                    if (localNetEl && data.localUrl) {
+                        localNetEl.href = data.localUrl;
+                        localNetEl.textContent = data.localUrl;
+                    }
+
+                    // 更新公网访问地址
+                    const publicUrlEl = document.getElementById('publicAccessUrl');
+                    const publicBadge = document.getElementById('publicAccessBadge');
+                    const publicLink = document.getElementById('publicUrlLink');
+                    const publicText = document.getElementById('publicUrlText');
+
+                    if (data.publicUrl) {
+                        if (publicUrlEl) {
+                            publicUrlEl.href = data.publicUrl;
+                            publicUrlEl.textContent = data.publicUrl;
+                        }
+                        if (publicBadge) {
+                            publicBadge.textContent = '在线';
+                            publicBadge.className = 'absolute -top-2 -right-2 bg-green-500 text-white text-xs rounded-full px-2 py-0.5';
+                        }
+                        // 更新导航栏公网链接
+                        if (publicLink) {
+                            publicLink.href = data.publicUrl;
+                            document.getElementById('publicUrlDisplay').classList.remove('hidden');
+                        }
+                        if (publicText) {
+                            publicText.textContent = '公网在线';
+                        }
+                    } else {
+                        if (publicUrlEl) {
+                            publicUrlEl.textContent = '未启动';
+                            publicUrlEl.href = '#';
+                        }
+                        if (publicBadge) {
+                            publicBadge.textContent = '离线';
+                            publicBadge.className = 'absolute -top-2 -right-2 bg-gray-300 text-white text-xs rounded-full px-2 py-0.5';
+                        }
+                    }
+                }
+            } catch (err) {
+                console.log('获取访问地址失败，请确保服务已启动');
+            }
+        }
+
+        // 页面加载后获取地址信息
+        fetchAccessUrls();
+        // 每 30 秒刷新一次公网状态
+        setInterval(fetchAccessUrls, 30000);
     </script>
     <script src="app.js"></script>
 </body>
